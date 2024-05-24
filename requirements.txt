@@ -1,4 +1,5 @@
 streamlit
+scipy
 stanza
 spacy
 flair==0.13.1
