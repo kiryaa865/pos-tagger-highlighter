@@ -1,7 +1,7 @@
 streamlit
 stanza
 spacy
-flair
+flair=0.13.1
 pymorphy3
 transformers
 openai
