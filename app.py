@@ -98,7 +98,7 @@ def loop_until_completed(clnt: object, thrd: object, run_obj: object) -> None:
         print(run_obj.status)
 
 
-loop_until_completed(client, thread, run_status)
+#loop_until_completed(client, thread, run_status)
 
 def print_thread_messages(clnt: object, thrd: object, content_value: bool=True) -> None:
     """
