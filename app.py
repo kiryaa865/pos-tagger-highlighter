@@ -19,14 +19,22 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 os.environ["OPENAI_API_KEY"] = openai_api_key
 client = OpenAI()
 
+@st.cache_resource
+def install_spacy_model():
+    try:
+        nlp_spacy = spacy.load("uk_core_news_sm")
+    except OSError:
+        subprocess.run(["python", "-m", "spacy", "download", "uk_core_news_sm"])
+        nlp_spacy = spacy.load("uk_core_news_sm")
+    return nlp_spacy
+
 # Initialize models
 @st.cache_resource
 def load_models():
     stanza.download('uk')
     nlp_stanza = stanza.Pipeline('uk')
     
-    spacy.cli.download("uk_core_news_sm")
-    nlp_spacy = spacy.load("uk_core_news_sm")
+    nlp_spacy = install_spacy_model()
 
     tagger_flair = SequenceTagger.load("dchaplinsky/flair-uk-pos")
 
