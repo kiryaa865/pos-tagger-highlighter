@@ -146,8 +146,7 @@ def capture_printed_output():
         print(tagged_text)
 
         print("\nRoBERTa:")
-        for item in formatted_output:
-            print(item)
+        print(tag_roberta_text(input_text))
     
     return captured_output.getvalue()
 
