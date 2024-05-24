@@ -12,6 +12,7 @@ from contextlib import redirect_stdout
 import os
 import time
 from openai import OpenAI
+import subprocess
 
 # Load secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
