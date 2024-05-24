@@ -143,8 +143,8 @@ def capture_printed_output():
 
         print("\nFlair:")
         tagged_text = tag_flair_text(input_text)
-        for word, pos in tagged_text:
-            print(f"{word}: {pos}")
+        tagged_text = tag_text(input_text)
+        print(tagged_text)
 
         print("\nRoBERTa:")
         for item in formatted_output:
