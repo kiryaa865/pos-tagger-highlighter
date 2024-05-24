@@ -1,0 +1,9 @@
+streamlit
+stanza
+spacy
+spacy-uk
+flair
+pymorphy3
+transformers
+openai
+torch
