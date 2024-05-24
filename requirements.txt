@@ -6,4 +6,3 @@ pymorphy3
 transformers
 openai
 torch
-scipy
