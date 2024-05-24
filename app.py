@@ -78,13 +78,13 @@ def tag_roberta_text(input_text):
             for token, tag in zip(tokens, tags) if token not in ["[CLS]", "[SEP]"]]
 
 assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
-user_message = str(input_text)
-thread = client.beta.threads.create()
-message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
+#user_message = str(input_text)
+#thread = client.beta.threads.create()
+#message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
 
-run = client.beta.threads.runs.create(thread_id = thread.id,assistant_id = assistant.id)
+#run = client.beta.threads.runs.create(thread_id = thread.id,assistant_id = assistant.id)
 
-run_status = client.beta.threads.runs.retrieve(thread_id = thread.id,run_id = run.id)
+#run_status = client.beta.threads.runs.retrieve(thread_id = thread.id,run_id = run.id)
 
 def loop_until_completed(clnt: object, thrd: object, run_obj: object) -> None:
     """
@@ -221,6 +221,7 @@ if st.button("Analyze"):
     run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant_id)
     run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
     loop_until_completed(client, thread, run_status)
+    print_thread_messages(client, thread)
     
     # Capture and process output
     captured_output = capture_printed_output()
