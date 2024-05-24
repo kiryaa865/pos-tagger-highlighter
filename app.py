@@ -1,0 +1,170 @@
+import streamlit as st
+import pandas as pd
+import re
+import io
+import stanza
+import spacy
+import pymorphy3
+from flair.models import SequenceTagger
+from flair.data import Sentence
+from transformers import AutoModelForTokenClassification, AutoTokenizer
+from contextlib import redirect_stdout
+
+# Initialize models
+@st.cache_resource
+def load_models():
+    stanza.download('uk')
+    nlp_stanza = stanza.Pipeline('uk')
+    
+    spacy.cli.download("uk_core_news_sm")
+    nlp_spacy = spacy.load("uk_core_news_sm")
+
+    tagger_flair = SequenceTagger.load("dchaplinsky/flair-uk-pos")
+
+    morph = pymorphy3.MorphAnalyzer(lang='uk')
+
+    model_roberta = AutoModelForTokenClassification.from_pretrained("KoichiYasuoka/roberta-base-ukrainian-upos")
+    tokenizer_roberta = AutoTokenizer.from_pretrained("KoichiYasuoka/roberta-base-ukrainian-upos")
+    
+    return nlp_stanza, nlp_spacy, tagger_flair, morph, model_roberta, tokenizer_roberta
+
+nlp_stanza, nlp_spacy, tagger_flair, morph, model_roberta, tokenizer_roberta = load_models()
+
+def stanza_pos(text):
+    doc = nlp_stanza(text)
+    return [(word.text, word.pos) for sentence in doc.sentences for word in sentence.words]
+
+def spacy_pos(text):
+    doc = nlp_spacy(text)
+    return [(token.text, token.pos_) for token in doc]
+
+def tag_ukrainian_text(text):
+    tagged_words = [(word, morph.parse(word)[0].tag.POS if word not in string.punctuation else None)
+                    for word in re.findall(r"[\w']+|[.,!?;]", text)]
+    return tagged_words
+
+def tag_flair_text(input_text):
+    sentence = Sentence(input_text)
+    tagger_flair.predict(sentence)
+    return [(token.text, token.get_tag("pos").value) for token in sentence]
+
+def tag_roberta_text(input_text):
+    inputs = tokenizer_roberta(input_text, return_tensors="pt")
+    outputs = model_roberta(**inputs).logits
+    predictions = torch.argmax(outputs, dim=2)
+    id2label = model_roberta.config.id2label
+    tokens = tokenizer_roberta.convert_ids_to_tokens(inputs["input_ids"][0])
+    tags = [id2label[p.item()] for p in predictions[0]]
+    return [(token.replace("##", ""), tag.replace("B-", "").replace("I-", ""))
+            for token, tag in zip(tokens, tags) if token not in ["[CLS]", "[SEP]"]]
+
+def capture_printed_output():
+    captured_output = io.StringIO()
+    with redirect_stdout(captured_output):
+        print("\nGPT 4o:")
+        print_thread_messages(client, thread)
+
+        print("\nStanza:")
+        for token, pos in stanza_pos_tags:
+            print(f"{token}: {pos}")
+
+        print("\nSpaCy:")
+        for token, pos in spacy_pos_tags:
+            print(f"{token}: {pos}")
+
+        print("\nPymorphy3:")
+        ukrainian_text = input_text
+        tagged_text = tag_ukrainian_text(ukrainian_text)
+        for word, pos in tagged_text:
+            print(f"{word}: {pos}")
+
+        print("\nFlair:")
+        tagged_text = tag_flair_text(input_text)
+        for word, pos in tagged_text:
+            print(f"{word}: {pos}")
+
+        print("\nRoBERTa:")
+        for item in formatted_output:
+            print(item)
+    
+    return captured_output.getvalue()
+
+def parse_output(output):
+    results = {"Token": []}
+    models = ["GPT 4o", "Stanza", "SpaCy", "Pymorphy3", "Flair", "RoBERTa"]
+    for model in models:
+        results[model] = []
+
+    current_model = None
+    token_dict = {model: [] for model in models}
+    token_positions = []
+
+    for line in output.splitlines():
+        if not line.strip():
+            continue
+        if any(model in line for model in models):
+            current_model = line.strip().replace(":", "")
+        elif current_model:
+            match = re.match(r"(.+): (.+)", line)
+            if match:
+                token, pos = match.groups()
+                token_dict[current_model].append((token, pos))
+                if current_model == "GPT 4o":
+                    token_positions.append(token.lower())
+
+    common_tokens = set(token.lower() for token, _ in token_dict[models[0]])
+    for model in models[1:]:
+        model_tokens = set(token.lower() for token, _ in token_dict[model])
+        common_tokens &= model_tokens
+
+    sorted_common_tokens = [token for token in token_positions if token in common_tokens]
+
+    for token in sorted_common_tokens:
+        results["Token"].append(token)
+        for model in models:
+            found = False
+            for token_model, pos in token_dict[model]:
+                if token == token_model.lower():
+                    results[model].append(pos)
+                    found = True
+                    break
+            if not found:
+                results[model].append(None)
+
+    return pd.DataFrame(results)
+
+def highlight_discrepancies(row):
+    tags = row[1:].values
+    tag_counts = pd.Series(tags).value_counts()
+    
+    if 'PUNCT' in tags:
+        return [''] * len(row)
+
+    if len(tag_counts) == 1:
+        return [''] * len(row)
+    
+    if tag_counts.iloc[0] == 5:
+        return [''] + ['background-color: yellow' if x != tag_counts.index[0] else '' for x in tags]
+
+    if tag_counts.iloc[0] == 4:
+        return [''] + ['background-color: yellow' if x != tag_counts.index[0] else '' for x in tags]
+
+    return [''] + ['background-color: yellow'] * len(tags)
+
+st.title("POS Tag Discrepancy Highlighter")
+
+input_text = st.text_area("Enter the text to analyze:")
+
+if st.button("Analyze"):
+    # Perform POS tagging with all models
+    stanza_pos_tags = stanza_pos(input_text)
+    spacy_pos_tags = spacy_pos(input_text)
+    pymorphy_pos_tags = tag_ukrainian_text(input_text)
+    flair_pos_tags = tag_flair_text(input_text)
+    roberta_pos_tags = tag_roberta_text(input_text)
+    
+    # Capture and process output
+    captured_output = capture_printed_output()
+    df = parse_output(captured_output)
+    highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
+    st.dataframe(highlighted_df)
