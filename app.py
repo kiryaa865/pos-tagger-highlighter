@@ -78,7 +78,7 @@ def tag_roberta_text(input_text):
             for token, tag in zip(tokens, tags) if token not in ["[CLS]", "[SEP]"]]
 
 assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
-
+user_message = str(input_text)
 thread = client.beta.threads.create()
 message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
 
