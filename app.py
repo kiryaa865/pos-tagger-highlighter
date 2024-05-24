@@ -17,11 +17,12 @@ import subprocess
 import string 
 import torch
 
+client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 # Load secrets
-openai_api_key = st.secrets["OPENAI_API_KEY"]
-
-os.environ["OPENAI_API_KEY"] = openai_api_key
-client = OpenAI()
+#openai_api_key = st.secrets["OPENAI_API_KEY"]
+assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
+#os.environ["OPENAI_API_KEY"] = openai_api_key
+#client = OpenAI()
 
 # Function to install the SpaCy model if not present
 @st.cache_resource
