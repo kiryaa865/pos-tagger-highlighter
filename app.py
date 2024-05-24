@@ -13,6 +13,7 @@ import os
 import time
 from openai import OpenAI
 import subprocess
+import string 
 
 # Load secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
