@@ -63,10 +63,18 @@ def tag_ukrainian_text(text):
                     for word in re.findall(r"[\w']+|[.,!?;]", text)]
     return tagged_words
 
+#def tag_flair_text(input_text):
+ #   sentence = Sentence(input_text)
+ #   tagger_flair.predict(sentence)
+ #   return [(token.text, token.get_tag("pos").value) for token in sentence]
+
 def tag_flair_text(input_text):
-    sentence = Sentence(input_text)
-    tagger_flair.predict(sentence)
-    return [(token.text, token.get_tag("pos").value) for token in sentence]
+  sentence = Sentence(input_text)
+  tagger_flair.predict(sentence)
+  output = ""
+  for token in sentence:
+    output += f"{token.text}: {token.tag}\n"
+  return output.strip()
 
 def tag_roberta_text(input_text):
     inputs = tokenizer_roberta(input_text, return_tensors="pt")
