@@ -11,6 +11,7 @@ from transformers import AutoModelForTokenClassification, AutoTokenizer
 from contextlib import redirect_stdout
 import os
 import time
+import openai
 from openai import OpenAI
 import subprocess
 import string 
