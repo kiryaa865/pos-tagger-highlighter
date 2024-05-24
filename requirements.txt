@@ -6,5 +6,5 @@ https://github.com/explosion/spacy-models/releases/download/uk_core_news_sm-3.7.
 flair
 pymorphy3
 transformers
-openai
+openai==1.30.3
 torch
