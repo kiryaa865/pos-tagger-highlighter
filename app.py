@@ -9,6 +9,15 @@ from flair.models import SequenceTagger
 from flair.data import Sentence
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 from contextlib import redirect_stdout
+import os
+import time
+from openai import OpenAI
+
+# Load secrets
+openai_api_key = st.secrets["OPENAI_API_KEY"]
+
+os.environ["OPENAI_API_KEY"] = openai_api_key
+client = OpenAI()
 
 # Initialize models
 @st.cache_resource
@@ -58,11 +67,43 @@ def tag_roberta_text(input_text):
     return [(token.replace("##", ""), tag.replace("B-", "").replace("I-", ""))
             for token, tag in zip(tokens, tags) if token not in ["[CLS]", "[SEP]"]]
 
+assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
+
+thread = client.beta.threads.create()
+message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
+
+run = client.beta.threads.runs.create(thread_id = thread.id,assistant_id = assistant.id)
+
+run_status = client.beta.threads.runs.retrieve(thread_id = thread.id,run_id = run.id)
+
+def loop_until_completed(clnt: object, thrd: object, run_obj: object) -> None:
+    """
+    Poll the Assistant runtime until the run is completed or failed
+    """
+    while run_obj.status not in ["completed", "failed", "requires_action"]:
+        run_obj = clnt.beta.threads.runs.retrieve(
+            thread_id = thrd.id,
+            run_id = run_obj.id)
+        time.sleep(10)
+        print(run_obj.status)
+
+
+loop_until_completed(client, thread, run_status)
+
+def print_thread_messages(clnt: object, thrd: object, content_value: bool=True) -> None:
+    """
+    Prints OpenAI thread messages to the console.
+    """
+    messages = clnt.beta.threads.messages.list(
+        thread_id = thrd.id)
+    print(messages.data[0].content[0].text.value)
+
 def capture_printed_output():
     captured_output = io.StringIO()
     with redirect_stdout(captured_output):
+        # Print results
         print("\nGPT 4o:")
-        print_thread_messages(client, thread)
+        print(print_thread_messages(client, thread))
 
         print("\nStanza:")
         for token, pos in stanza_pos_tags:
@@ -162,6 +203,14 @@ if st.button("Analyze"):
     pymorphy_pos_tags = tag_ukrainian_text(input_text)
     flair_pos_tags = tag_flair_text(input_text)
     roberta_pos_tags = tag_roberta_text(input_text)
+    
+    # OpenAI API interaction
+    user_message = str(input_text)
+    thread = client.beta.threads.create()
+    message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
+    run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant_id)
+    run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+    loop_until_completed(client, thread, run_status)
     
     # Capture and process output
     captured_output = capture_printed_output()
