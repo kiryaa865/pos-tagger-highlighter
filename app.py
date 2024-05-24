@@ -14,6 +14,7 @@ import time
 from openai import OpenAI
 import subprocess
 import string 
+import torch
 
 # Load secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
