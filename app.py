@@ -20,12 +20,13 @@ openai_api_key = st.secrets["OPENAI_API_KEY"]
 os.environ["OPENAI_API_KEY"] = openai_api_key
 client = OpenAI()
 
+# Function to install the SpaCy model if not present
 @st.cache_resource
 def install_spacy_model():
     try:
         nlp_spacy = spacy.load("uk_core_news_sm")
     except OSError:
-        subprocess.run(["python", "-m", "spacy", "download", "uk_core_news_sm"])
+        subprocess.run(["python", "-m", "spacy", "download", "uk_core_news_sm"], check=True)
         nlp_spacy = spacy.load("uk_core_news_sm")
     return nlp_spacy
 
