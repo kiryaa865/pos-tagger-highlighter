@@ -190,49 +190,7 @@ def capture_printed_output():
     
     return captured_output.getvalue()
 
-def parse_output(output):
-    results = {"Token": []}
-    models = ["GPT 4o", "Stanza", "SpaCy", "Pymorphy3", "Flair", "RoBERTa"]
-    for model in models:
-        results[model] = []
-
-    current_model = None
-    token_dict = {model: [] for model in models}
-    token_positions = []
-
-    for line in output.splitlines():
-        if not line.strip():
-            continue
-        if any(model in line for model in models):
-            current_model = line.strip().replace(":", "")
-        elif current_model:
-            match = re.match(r"(.+): (.+)", line)
-            if match:
-                token, pos = match.groups()
-                token_dict[current_model].append((token, pos))
-                if current_model == "GPT 4o":
-                    token_positions.append(token.lower())
-
-    common_tokens = set(token.lower() for token, _ in token_dict[models[0]])
-    for model in models[1:]:
-        model_tokens = set(token.lower() for token, _ in token_dict[model])
-        common_tokens &= model_tokens
-
-    sorted_common_tokens = [token for token in token_positions if token in common_tokens]
-
-    for token in sorted_common_tokens:
-        results["Token"].append(token)
-        for model in models:
-            found = False
-            for token_model, pos in token_dict[model]:
-                if token == token_model.lower():
-                    results[model].append(pos)
-                    found = True
-                    break
-            if not found:
-                results[model].append(None)
-
-    return pd.DataFrame(results)
+привіт! Як твої справи?
 
 def highlight_discrepancies(row):
     tags = row[1:].values
