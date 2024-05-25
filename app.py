@@ -157,7 +157,7 @@ def capture_printed_output():
 
         print("\nRoBERTa:")
         formatted_output = [f"{token}: {tag}" for token, tag in tag_roberta_text(input_text)]
-        print(tag_roberta_text(input_text))
+       # print(tag_roberta_text(input_text))
         for item in formatted_output:
             print(item)
     
