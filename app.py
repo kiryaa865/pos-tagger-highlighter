@@ -353,19 +353,19 @@ if st.button("Почати"):
     os.write(1, f"{captured_output}\n".encode())
     df = parse_output(captured_output)
     highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
-    st.dataframe(highlighted_df)
-    st.session_state.show_guide_button = True
+    st.session_state.highlighted_df = highlighted_df
+    st.session_state.show_guide = False
     st.session_state.show_results = True
 
 # Show the dataframe if the "Почати" button has been clicked
 if st.session_state.show_results:
-    st.dataframe(highlighted_df)
-
-# Show the guide button if the "Почати" button has been clicked
-if st.session_state.show_guide_button:
+    st.dataframe(st.session_state.highlighted_df)
     if st.button("Показати довідник з тегами"):
         st.session_state.show_guide = True
 
 # Show the guide if the "Показати довідник з тегами" button has been clicked
 if st.session_state.show_guide:
     show_tags_guide()
+
+
+
