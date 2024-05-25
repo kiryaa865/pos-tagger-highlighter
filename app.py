@@ -284,7 +284,44 @@ def highlight_discrepancies(row):
     print(f"3 or fewer agree, highlighting the whole row: {result}")
     return result
 
+tags_explanations = {
+    "NOUN": "іменник",
+    "PUNCT": "пунктуація",
+    "VERB": "дієслово",
+    "ADJ/ADJF": "прикметник",
+    "ADP": "прийменник",
+    "ADV": "прислівник",
+    "PRON": "займенник",
+    "CCONJ": "сполучник",
+    "DET": "детермінатив",
+    "PART": "частка",
+    "PROPN": "власна назва",
+    "SCONJ": "підрядний сполучник",
+    "NUM": "числівник",
+    "AUX": "допоміжне дієслово",
+    "X": "інше",
+    "INTJ": "вигук",
+    "SYM": "символ",
+    "ADJS": "прикметник коротка форма",
+    "COMP": "порівняльна ступінь",
+    "INFN": "інфінітив",
+    "PRTF": "дієприкметник",
+    "PRTS": "коротка форма дієприкметника",
+    "GRND": "дієприслівник",
+    "NUMR": "числівник",
+    "ADVB": "прислівник",
+    "NPRO": "займенник",
+    "PRED": "предикатив",
+    "PREP": "прийменник",
+    "CONJ": "сполучник",
+    "PRCL": "частка"
+}
 
+def show_tags_guide():
+    st.write("## Довідник з тегами")
+    data = [{"Тег": tag, "Пояснення": explanation} for tag, explanation in tags_explanations.items()]
+    st.table(data)
+    
 if st.button("Почати"):
     # Perform POS tagging with all models
     #stanza_pos_tags = stanza_pos(input_text)
@@ -312,3 +349,5 @@ if st.button("Почати"):
     df = parse_output(captured_output)
     highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
     st.dataframe(highlighted_df)
+    if st.button("Показати довідник з тегами"):
+    show_tags_guide()
