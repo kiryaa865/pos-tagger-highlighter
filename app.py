@@ -192,7 +192,7 @@ def capture_printed_output():
 
 def parse_output(output):
     results = {"Token": []}
-    models = ["Fine-tuned GPT-4", "Stanza", "SpaCy", "Pymorphy3", "Flair", "RoBERTa"]
+    models = ["Fine-Tuned GPT-4", "Stanza", "SpaCy", "Pymorphy3", "Flair", "Fine-Tuned RoBERTa"]
     for model in models:
         results[model] = []
 
