@@ -159,7 +159,7 @@ def capture_printed_output():
     captured_output = io.StringIO()
     with redirect_stdout(captured_output):
         # Print results
-        print("\nGPT 4o:")
+        print("\nFine-Tuned GPT-4:")
         print(print_thread_messages(client, thread))
 
         print("\nStanza:")
@@ -182,7 +182,7 @@ def capture_printed_output():
         tagged_text = tag_flair_text(input_text)
         print(tagged_text)
 
-        print("\nRoBERTa:")
+        print("\nFine-Tuned RoBERTa:")
         formatted_output = tag_roberta_text(input_text)
         for item in formatted_output:
            print(item)
