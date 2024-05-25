@@ -362,6 +362,13 @@ if st.button("Почати"):
 # Show the dataframe if the "Почати" button has been clicked
 if st.session_state.show_results:
     st.dataframe(st.session_state.highlighted_df)
+    csv = st.session_state.df.to_csv(index=False)
+    st.download_button(
+        label="Download CSV",
+        data=csv,
+        file_name='results.csv',
+        mime='text/csv'
+    )
     if st.button("Показати довідник з тегами"):
         st.session_state.show_guide = True
 
