@@ -146,6 +146,7 @@ def capture_printed_output():
             print(f"{token}: {pos}")
 
         print("\nSpaCy:")
+        spacy_pos_tags = spacy_pos(input_text)
         for token, pos in spacy_pos_tags:
             print(f"{token}: {pos}")
 
