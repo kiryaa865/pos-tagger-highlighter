@@ -192,7 +192,12 @@ def capture_printed_output():
 
 def parse_output(output):
     results = {"Token": []}
-    models = ["GPT 4o", "Stanza", "SpaCy", "Pymorphy3", "Flair", "RoBERTa"]
+    models = ["Fine-tuned GPT-4", "Stanza", "SpaCy", "Pymorphy3", "Flair", "Fine-tuned RoBERTa"]
+    model_map = {
+        "GPT 4o": "Fine-tuned GPT-4",
+        "RoBERTa": "Fine-tuned RoBERTa"
+    }
+
     for model in models:
         results[model] = []
 
@@ -203,31 +208,29 @@ def parse_output(output):
     for line in output.splitlines():
         if not line.strip():
             continue
-        if any(model in line for model in models):
+        if any(model in line for model in model_map.keys()):
+            current_model = model_map[line.strip().replace(":", "")]
+        elif any(model in line for model in models):
             current_model = line.strip().replace(":", "")
         elif current_model:
             match = re.match(r"(.+): (.+)", line)
             if match:
                 token, pos = match.groups()
                 token_dict[current_model].append((token, pos))
-                if current_model == "GPT 4o":
+                if current_model == "Fine-tuned GPT-4":
                     token_positions.append(token.lower())
 
-    # Get a set of tokens that appear in all models' outputs
     common_tokens = set(token.lower() for token, _ in token_dict[models[0]])
     for model in models[1:]:
         model_tokens = set(token.lower() for token, _ in token_dict[model])
         common_tokens &= model_tokens
 
-    # Sort tokens based on their first appearance in the input
     sorted_common_tokens = [token for token in token_positions if token in common_tokens]
 
-    # Create a mapping from lowercase tokens to their capitalized versions in GPT
     gpt_capitalized_tokens = {}
-    for token, pos in token_dict["GPT 4o"]:
+    for token, pos in token_dict["Fine-tuned GPT-4"]:
         gpt_capitalized_tokens[token.lower()] = token
 
-    # Ensure tokens are aligned across all models
     for token in sorted_common_tokens:
         capitalized_token = gpt_capitalized_tokens.get(token, token)
         results["Token"].append(capitalized_token)
