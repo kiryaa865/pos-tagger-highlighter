@@ -148,9 +148,9 @@ def print_thread_messages(clnt: object, thrd: object, content_value: bool=True) 
         thread_id = thrd.id)
     print(messages.data[0].content[0].text.value)
 
-st.title("POS Tag Discrepancy Highlighter")
+st.title("Інструмент для порівняння POS-тегування")
 
-input_text = st.text_area("Enter the text to analyze:")
+input_text = st.text_area("Уведіть текст для аналізу:")
 
     # OpenAI API interaction
 assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
@@ -285,7 +285,7 @@ def highlight_discrepancies(row):
     return result
 
 
-if st.button("Analyze"):
+if st.button("Почати"):
     # Perform POS tagging with all models
     #stanza_pos_tags = stanza_pos(input_text)
     #spacy_pos_tags = spacy_pos(input_text)
