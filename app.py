@@ -236,26 +236,42 @@ def parse_output(output):
 
 def highlight_discrepancies(row):
     tags = row[1:].values
+    tags = [tag.strip() if tag is not None else None for tag in tags]  # Strip whitespace from tags
     tag_counts = pd.Series(tags).value_counts()
+
+    # Debug print statements
+    print(f"Token: {row['Token']}")
+    print(f"Tags: {tags}")
+    print(f"Tag Counts: {tag_counts}")
 
     # Check for PUNCT tag
     if 'PUNCT' in tags:
+        print("PUNCT found, no highlighting.")
         return [''] * len(row)
 
     # All models agree
     if len(tag_counts) == 1:
+        print("All models agree, no highlighting.")
         return [''] * len(row)
 
     # 5 out of 6 agree
     if tag_counts.iloc[0] == 5:
-        return [''] + ['background-color: yellow' if x != tag_counts.index[0] else '' for x in tags]
+        most_common_tag = tag_counts.index[0]
+        result = [''] + ['background-color: yellow' if x != most_common_tag else '' for x in tags]
+        print(f"5 out of 6 agree, highlighting: {result}")
+        return result
 
     # 4 out of 6 agree
     if tag_counts.iloc[0] == 4:
-        return [''] + ['background-color: yellow' if x != tag_counts.index[0] else '' for x in tags]
+        most_common_tag = tag_counts.index[0]
+        result = [''] + ['background-color: yellow' if x != most_common_tag else '' for x in tags]
+        print(f"4 out of 6 agree, highlighting: {result}")
+        return result
 
     # 3 or fewer agree
-    return [''] + ['background-color: yellow'] * len(tags)
+    result = [''] + ['background-color: yellow'] * len(tags)
+    print(f"3 or fewer agree, highlighting the whole row: {result}")
+    return result
 
 
 if st.button("Analyze"):
