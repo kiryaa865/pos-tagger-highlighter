@@ -350,4 +350,4 @@ if st.button("Почати"):
     highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
     st.dataframe(highlighted_df)
     if st.button("Показати довідник з тегами"):
-    show_tags_guide()
+        show_tags_guide()
