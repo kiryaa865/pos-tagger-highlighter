@@ -284,45 +284,44 @@ def highlight_discrepancies(row):
     print(f"3 or fewer agree, highlighting the whole row: {result}")
     return result
 
-tags_explanations = {
-    "NOUN": "іменник",
-    "PUNCT": "пунктуація",
-    "VERB": "дієслово",
-    "ADJ/ADJF": "прикметник",
-    "ADP": "прийменник",
-    "ADV": "прислівник",
-    "PRON": "займенник",
-    "CCONJ": "сполучник",
-    "DET": "детермінатив",
-    "PART": "частка",
-    "PROPN": "власна назва",
-    "SCONJ": "підрядний сполучник",
-    "NUM": "числівник",
-    "AUX": "допоміжне дієслово",
-    "X": "інше",
-    "INTJ": "вигук",
-    "SYM": "символ",
-    "ADJS": "прикметник коротка форма",
-    "COMP": "порівняльна ступінь",
-    "INFN": "інфінітив",
-    "PRTF": "дієприкметник",
-    "PRTS": "коротка форма дієприкметника",
-    "GRND": "дієприслівник",
-    "NUMR": "числівник",
-    "ADVB": "прислівник",
-    "NPRO": "займенник",
-    "PRED": "предикатив",
-    "PREP": "прийменник",
-    "CONJ": "сполучник",
-    "PRCL": "частка"
-}
 if 'show_guide_button' not in st.session_state:
     st.session_state.show_guide_button = False
 if 'show_guide' not in st.session_state:
     st.session_state.show_guide = False
-    
+
 def show_tags_guide():
-    st.write("## Довідник з тегами")
+    tags_explanations = {
+        "NOUN": "іменник",
+        "PUNCT": "пунктуація",
+        "VERB": "дієслово",
+        "ADJ/ADJF": "прикметник",
+        "ADP": "прийменник",
+        "ADV": "прислівник",
+        "PRON": "займенник",
+        "CCONJ": "сполучник",
+        "DET": "детермінатив",
+        "PART": "частка",
+        "PROPN": "власна назва",
+        "SCONJ": "підрядний сполучник",
+        "NUM": "числівник",
+        "AUX": "допоміжне дієслово",
+        "X": "інше",
+        "INTJ": "вигук",
+        "SYM": "символ",
+        "ADJS": "прикметник коротка форма",
+        "COMP": "порівняльна ступінь",
+        "INFN": "інфінітив",
+        "PRTF": "дієприкметник",
+        "PRTS": "коротка форма дієприкметника",
+        "GRND": "дієприслівник",
+        "NUMR": "числівник",
+        "ADVB": "прислівник",
+        "NPRO": "займенник",
+        "PRED": "предикатив",
+        "PREP": "прийменник",
+        "CONJ": "сполучник",
+        "PRCL": "частка"
+    }
     data = [{"Тег": tag, "Пояснення": explanation} for tag, explanation in tags_explanations.items()]
     st.table(data)
     
@@ -354,7 +353,13 @@ if st.button("Почати"):
     highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
     st.dataframe(highlighted_df)
     st.session_state.show_guide_button = True
-    
+    st.session_state.show_results = True
+
+# Show the dataframe if the "Почати" button has been clicked
+if st.session_state.show_results:
+    st.dataframe(highlighted_df)
+
+# Show the guide button if the "Почати" button has been clicked
 if st.session_state.show_guide_button:
     if st.button("Показати довідник з тегами"):
         st.session_state.show_guide = True
