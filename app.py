@@ -231,23 +231,22 @@ def highlight_discrepancies(row):
 
 if st.button("Analyze"):
     # Perform POS tagging with all models
-   stanza_pos_tags = stanza_pos(input_text)
-   spacy_pos_tags = spacy_pos(input_text)
-   pymorphy_pos_tags = tag_ukrainian_text(input_text)
-   flair_pos_tags = tag_flair_text(input_text)
-   roberta_pos_tags = tag_roberta_text(input_text)
-
+    stanza_pos_tags = stanza_pos(input_text)
+    spacy_pos_tags = spacy_pos(input_text)
+    pymorphy_pos_tags = tag_ukrainian_text(input_text)
+    flair_pos_tags = tag_flair_text(input_text)
+    roberta_pos_tags = tag_roberta_text(input_text)
+    
+    # OpenAI API interaction
     user_message = str(input_text)
     thread = client.beta.threads.create()
     message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
-    run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant_id)
-    run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+    run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
+    run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run_obj.id)
     loop_until_completed(client, thread, run_status)
-    
     
     # Capture and process output
     captured_output = capture_printed_output()
-    print("Captured Output:\n", captured_output)
     df = parse_output(captured_output)
     highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
     st.dataframe(highlighted_df)
