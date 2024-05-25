@@ -20,7 +20,7 @@ import torch
 client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 # Load secrets
 #openai_api_key = st.secrets["OPENAI_API_KEY"]
-assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
+assistant = client.beta.assistants.retrieve("asst_j3as6b0uolhI7cLVU8MS40cK")
 #os.environ["OPENAI_API_KEY"] = openai_api_key
 #client = OpenAI()
 
@@ -117,7 +117,6 @@ def tag_roberta_text(input_text):
     return [f"{token}: {tag}" for token, tag in zip(word_tokens, word_tags)]
 
 
-#assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
 #user_message = str(input_text)
 #thread = client.beta.threads.create()
 #message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
@@ -153,7 +152,7 @@ st.title("Інструмент для порівняння POS-тегуванн�
 input_text = st.text_area("Уведіть текст для аналізу:")
 
     # OpenAI API interaction
-assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
+assistant = client.beta.assistants.retrieve("asst_j3as6b0uolhI7cLVU8MS40cK")
 
 
 def capture_printed_output():
