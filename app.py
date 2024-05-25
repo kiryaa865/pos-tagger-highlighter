@@ -247,6 +247,7 @@ if st.button("Analyze"):
     
     # Capture and process output
     captured_output = capture_printed_output()
+    print(captured_output)
     df = parse_output(captured_output)
     highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
     st.dataframe(highlighted_df)
