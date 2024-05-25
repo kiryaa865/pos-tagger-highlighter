@@ -284,6 +284,8 @@ def highlight_discrepancies(row):
     print(f"3 or fewer agree, highlighting the whole row: {result}")
     return result
 
+if 'show_results' not in st.session_state:
+    st.session_state.show_results = False
 if 'show_guide_button' not in st.session_state:
     st.session_state.show_guide_button = False
 if 'show_guide' not in st.session_state:
