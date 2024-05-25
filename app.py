@@ -224,7 +224,7 @@ def parse_output(output):
 
     # Create a mapping from lowercase tokens to their capitalized versions in GPT
     gpt_capitalized_tokens = {}
-    for token, pos in token_dict["Fine-Tuned GPT-4"]:
+    for token, pos in token_dict["GPT 4o"]:
         gpt_capitalized_tokens[token.lower()] = token
 
     # Ensure tokens are aligned across all models
