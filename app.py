@@ -210,21 +210,25 @@ def parse_output(output):
 def highlight_discrepancies(row):
     tags = row[1:].values
     tag_counts = pd.Series(tags).value_counts()
-    
+
+    # Check for PUNCT tag
     if 'PUNCT' in tags:
         return [''] * len(row)
 
+    # All models agree
     if len(tag_counts) == 1:
         return [''] * len(row)
-    
+
+    # 5 out of 6 agree
     if tag_counts.iloc[0] == 5:
         return [''] + ['background-color: yellow' if x != tag_counts.index[0] else '' for x in tags]
 
+    # 4 out of 6 agree
     if tag_counts.iloc[0] == 4:
         return [''] + ['background-color: yellow' if x != tag_counts.index[0] else '' for x in tags]
 
+    # 3 or fewer agree
     return [''] + ['background-color: yellow'] * len(tags)
-
 
 
 if st.button("Analyze"):
