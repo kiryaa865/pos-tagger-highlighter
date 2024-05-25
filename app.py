@@ -141,6 +141,7 @@ def capture_printed_output():
         print(print_thread_messages(client, thread))
 
         print("\nStanza:")
+        stanza_pos_tags = stanza_pos(input_text)
         for token, pos in stanza_pos_tags:
             print(f"{token}: {pos}")
 
