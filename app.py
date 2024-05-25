@@ -292,6 +292,8 @@ if 'show_guide_button' not in st.session_state:
     st.session_state.show_guide_button = False
 if 'show_guide' not in st.session_state:
     st.session_state.show_guide = False
+if 'df' not in st.session_state:
+    st.session_state.df = None
 
 def show_tags_guide():
     tags_explanations = {
