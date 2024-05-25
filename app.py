@@ -89,7 +89,7 @@ def tag_roberta_text(input_text):
     return [(token.replace("##", ""), tag.replace("B-", "").replace("I-", ""))
             for token, tag in zip(tokens, tags) if token not in ["[CLS]", "[SEP]"]]
 
-assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
+#assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
 #user_message = str(input_text)
 #thread = client.beta.threads.create()
 #message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
@@ -126,12 +126,7 @@ input_text = st.text_area("Enter the text to analyze:")
 
     # OpenAI API interaction
 assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
-user_message = str(input_text)
-thread = client.beta.threads.create()
-message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
-run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
-run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-loop_until_completed(client, thread, run_status)
+
 
 def capture_printed_output():
     captured_output = io.StringIO()
@@ -236,7 +231,12 @@ if st.button("Analyze"):
     #pymorphy_pos_tags = tag_ukrainian_text(input_text)
     #flair_pos_tags = tag_flair_text(input_text)
     #roberta_pos_tags = tag_roberta_text(input_text)
-    
+    user_message = str(input_text)
+    thread = client.beta.threads.create()
+    message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
+    run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
+    run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+    loop_until_completed(client, thread, run_status)
     # OpenAI API interaction
     #user_message = str(input_text)
     #thread = client.beta.threads.create()
