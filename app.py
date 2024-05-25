@@ -86,8 +86,26 @@ def tag_roberta_text(input_text):
     id2label = model_roberta.config.id2label
     tokens = tokenizer_roberta.convert_ids_to_tokens(inputs["input_ids"][0])
     tags = [id2label[p.item()] for p in predictions[0]]
-    return [(token.replace("##", ""), tag.replace("B-", "").replace("I-", ""))
-            for token, tag in zip(tokens, tags) if token not in ["[CLS]", "[SEP]"]]
+    word_tokens = []
+    word_tags = []
+    current_word = ""
+    current_tag = ""
+    for token, tag in zip(tokens, tags):
+      if token in ["[CLS]", "[SEP]"]:
+        continue  # Skip special tokens
+      if token.startswith("##"):
+        current_word += token[2:]
+      else:
+        if current_word:
+             word_tokens.append(current_word)
+             word_tags.append(current_tag.replace("B-", "").replace("I-", ""))  # Remove B- and I- prefixes
+        current_word = token
+        current_tag = tag
+
+    if current_word:
+      word_tokens.append(current_word)
+      word_tags.append(current_tag.replace("B-", "").replace("I-", ""))
+    return [f"{token}: {tag}" for token, tag in zip(word_tokens, word_tags)]
 
 #assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
 #user_message = str(input_text)
@@ -156,10 +174,9 @@ def capture_printed_output():
         print(tagged_text)
 
         print("\nRoBERTa:")
-        formatted_output = [f"{token}: {tag}" for token, tag in tag_roberta_text(input_text)]
-        print(tag_roberta_text(input_text))
+        formatted_output = tag_roberta_text(input_text)
         for item in formatted_output:
-            print(item)
+           print(item)
     
     return captured_output.getvalue()
 
