@@ -316,7 +316,11 @@ tags_explanations = {
     "CONJ": "сполучник",
     "PRCL": "частка"
 }
-
+if 'show_guide_button' not in st.session_state:
+    st.session_state.show_guide_button = False
+if 'show_guide' not in st.session_state:
+    st.session_state.show_guide = False
+    
 def show_tags_guide():
     st.write("## Довідник з тегами")
     data = [{"Тег": tag, "Пояснення": explanation} for tag, explanation in tags_explanations.items()]
@@ -349,5 +353,12 @@ if st.button("Почати"):
     df = parse_output(captured_output)
     highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
     st.dataframe(highlighted_df)
+    st.session_state.show_guide_button = True
+    
+if st.session_state.show_guide_button:
     if st.button("Показати довідник з тегами"):
-        show_tags_guide()
+        st.session_state.show_guide = True
+
+# Show the guide if the "Показати довідник з тегами" button has been clicked
+if st.session_state.show_guide:
+    show_tags_guide()
