@@ -363,7 +363,7 @@ if st.session_state.show_results:
     if st.button("Показати довідник з тегами"):
         st.session_state.show_guide = True
 
-# Show the guide if the "Показати довідник з тегами" button has been clicked
+# Show the guide if the "Показати довідник із тегами" button has been clicked
 if st.session_state.show_guide:
     show_tags_guide()
 
