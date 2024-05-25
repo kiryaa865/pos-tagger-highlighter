@@ -86,26 +86,36 @@ def tag_roberta_text(input_text):
     id2label = model_roberta.config.id2label
     tokens = tokenizer_roberta.convert_ids_to_tokens(inputs["input_ids"][0])
     tags = [id2label[p.item()] for p in predictions[0]]
+
     word_tokens = []
     word_tags = []
     current_word = ""
     current_tag = ""
+
     for token, tag in zip(tokens, tags):
-      if token in ["[CLS]", "[SEP]"]:
-        continue  # Skip special tokens
-      if token.startswith("##"):
-        current_word += token[2:]
-      else:
-        if current_word:
-             word_tokens.append(current_word)
-             word_tags.append(current_tag.replace("B-", "").replace("I-", ""))  # Remove B- and I- prefixes
-        current_word = token
-        current_tag = tag
+        if token in ["[CLS]", "[SEP]"]:
+            continue  # Skip special tokens
+        if token.startswith("##"):
+            current_word += token[2:]
+        else:
+            if current_word:
+                word_tokens.append(current_word)
+                word_tags.append(current_tag.replace("B-", "").replace("I-", ""))  # Remove B- and I- prefixes
+            current_word = token
+            current_tag = tag
 
     if current_word:
-      word_tokens.append(current_word)
-      word_tags.append(current_tag.replace("B-", "").replace("I-", ""))
+        word_tokens.append(current_word)
+        word_tags.append(current_tag.replace("B-", "").replace("I-", ""))
+
+    # Debugging output
+    print("Tokens:", tokens)
+    print("Tags:", tags)
+    print("Word Tokens:", word_tokens)
+    print("Word Tags:", word_tags)
+
     return [f"{token}: {tag}" for token, tag in zip(word_tokens, word_tags)]
+
 
 #assistant = client.beta.assistants.retrieve("asst_7Lbs35tXNgg5HwAkjQKU5xZs")
 #user_message = str(input_text)
