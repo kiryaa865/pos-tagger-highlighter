@@ -16,18 +16,13 @@ from openai import OpenAI
 import subprocess
 import string 
 import torch
-st.markdown(
-    """
-    <style>
-    .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-    .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-    .viewerBadge_text__1JaDK {
-        display: none;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+hide_streamlit_style = """
+            <style>
+            [data-testid="stToolbar"] {visibility: hidden !important;}
+            footer {visibility: hidden !important;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 # Load secrets
 #openai_api_key = st.secrets["OPENAI_API_KEY"]
