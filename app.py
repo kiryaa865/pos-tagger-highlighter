@@ -28,7 +28,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.markdown(hide_github_icon, unsafe_allow_html=True)
 client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 # Load secrets
 #openai_api_key = st.secrets["OPENAI_API_KEY"]
