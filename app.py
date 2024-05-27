@@ -165,7 +165,7 @@ def capture_printed_output():
     captured_output = io.StringIO()
     with redirect_stdout(captured_output):
         # Print results
-        print("\nGPT 4o:")
+        print("\nFine-tuned GPT-3.5:")
         print(print_thread_messages(client, thread))
 
         print("\nStanza:")
@@ -198,9 +198,9 @@ def capture_printed_output():
 
 def parse_output(output):
     results = {"Token": []}
-    models = ["Fine-tuned GPT-4", "Stanza", "SpaCy", "Pymorphy3", "Flair", "Fine-tuned RoBERTa"]
+    models = ["Fine-tuned GPT-3.5", "Stanza", "SpaCy", "Pymorphy3", "Flair", "Fine-tuned RoBERTa"]
     model_map = {
-        "GPT 4o": "Fine-tuned GPT-4",
+        "Fine-tuned GPT-3.5": "Fine-tuned GPT-3.5",
         "RoBERTa": "Fine-tuned RoBERTa"
     }
 
@@ -223,7 +223,7 @@ def parse_output(output):
             if match:
                 token, pos = match.groups()
                 token_dict[current_model].append((token, pos))
-                if current_model == "Fine-tuned GPT-4":
+                if current_model == "Fine-tuned GPT-3.5":
                     token_positions.append(token.lower())
 
     common_tokens = set(token.lower() for token, _ in token_dict[models[0]])
@@ -234,7 +234,7 @@ def parse_output(output):
     sorted_common_tokens = [token for token in token_positions if token in common_tokens]
 
     gpt_capitalized_tokens = {}
-    for token, pos in token_dict["Fine-tuned GPT-4"]:
+    for token, pos in token_dict["Fine-tuned GPT-3.5"]:
         gpt_capitalized_tokens[token.lower()] = token
 
     for token in sorted_common_tokens:
@@ -374,6 +374,3 @@ if st.session_state.show_results:
 # Show the guide if the "Показати довідник із тегами" button has been clicked
 if st.session_state.show_guide:
     show_tags_guide()
-
-
-
