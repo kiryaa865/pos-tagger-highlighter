@@ -200,7 +200,7 @@ def parse_output(output):
     results = {"Token": []}
     models = ["Fine-tuned GPT-4", "Stanza", "SpaCy", "Pymorphy3", "Flair", "Fine-tuned RoBERTa"]
     model_map = {
-        "GPT 4o": "Fine-tuned GPT-4",
+        "GPT 4o": "Fine-tuned GPT-3.5",
         "RoBERTa": "Fine-tuned RoBERTa"
     }
 
