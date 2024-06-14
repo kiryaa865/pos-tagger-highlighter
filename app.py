@@ -16,6 +16,7 @@ from openai import OpenAI
 import subprocess
 import string 
 import torch
+
 hide_streamlit_style = """
             <style>
             [data-testid="stToolbar"] {visibility: hidden !important;}
@@ -24,6 +25,7 @@ hide_streamlit_style = """
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
+
 # Load secrets
 #openai_api_key = st.secrets["OPENAI_API_KEY"]
 assistant = client.beta.assistants.retrieve("asst_j3as6b0uolhI7cLVU8MS40cK")
@@ -72,18 +74,13 @@ def tag_ukrainian_text(text):
                     for word in re.findall(r"[\w']+|[.,!?;]", text)]
     return tagged_words
 
-#def tag_flair_text(input_text):
- #   sentence = Sentence(input_text)
- #   tagger_flair.predict(sentence)
- #   return [(token.text, token.get_tag("pos").value) for token in sentence]
-
 def tag_flair_text(input_text):
-  sentence = Sentence(input_text)
-  tagger_flair.predict(sentence)
-  output = ""
-  for token in sentence:
-    output += f"{token.text}: {token.tag}\n"
-  return output.strip()
+    sentence = Sentence(input_text)
+    tagger_flair.predict(sentence)
+    output = ""
+    for token in sentence:
+        output += f"{token.text}: {token.tag}\n"
+    return output.strip()
 
 def tag_roberta_text(input_text):
     inputs = tokenizer_roberta(input_text, return_tensors="pt")
@@ -114,22 +111,7 @@ def tag_roberta_text(input_text):
         word_tokens.append(current_word)
         word_tags.append(current_tag.replace("B-", "").replace("I-", ""))
 
-    # Debugging output
-    print("Tokens:", tokens)
-    print("Tags:", tags)
-    print("Word Tokens:", word_tokens)
-    print("Word Tags:", word_tags)
-
     return [f"{token}: {tag}" for token, tag in zip(word_tokens, word_tags)]
-
-
-#user_message = str(input_text)
-#thread = client.beta.threads.create()
-#message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
-
-#run = client.beta.threads.runs.create(thread_id = thread.id,assistant_id = assistant.id)
-
-#run_status = client.beta.threads.runs.retrieve(thread_id = thread.id,run_id = run.id)
 
 def loop_until_completed(clnt: object, thrd: object, run_obj: object) -> None:
     """
@@ -141,9 +123,6 @@ def loop_until_completed(clnt: object, thrd: object, run_obj: object) -> None:
             run_id = run_obj.id)
         time.sleep(10)
         print(run_obj.status)
-
-
-#loop_until_completed(client, thread, run_status)
 
 def print_thread_messages(clnt: object, thrd: object, content_value: bool=True) -> None:
     """
@@ -157,9 +136,11 @@ st.title("Інструмент для порівняння POS-тегуванн�
 
 input_text = st.text_area("Уведіть текст для аналізу:")
 
-    # OpenAI API interaction
-assistant = client.beta.assistants.retrieve("asst_j3as6b0uolhI7cLVU8MS40cK")
+if not input_text:
+    st.write("Будь ласка, уведіть текст для аналізу.")
 
+# OpenAI API interaction
+assistant = client.beta.assistants.retrieve("asst_j3as6b0uolhI7cLVU8MS40cK")
 
 def capture_printed_output():
     captured_output = io.StringIO()
@@ -194,7 +175,6 @@ def capture_printed_output():
            print(item)
     
     return captured_output.getvalue()
-
 
 def parse_output(output):
     results = {"Token": []}
@@ -251,7 +231,6 @@ def parse_output(output):
                 results[model].append(None)
 
     return pd.DataFrame(results)
-
 
 def highlight_discrepancies(row):
     tags = row[1:].values
@@ -336,34 +315,25 @@ def show_tags_guide():
     st.table(data)
     
 if st.button("Почати"):
-    # Perform POS tagging with all models
-    #stanza_pos_tags = stanza_pos(input_text)
-    #spacy_pos_tags = spacy_pos(input_text)
-    #pymorphy_pos_tags = tag_ukrainian_text(input_text)
-    #flair_pos_tags = tag_flair_text(input_text)
-    #roberta_pos_tags = tag_roberta_text(input_text)
-    user_message = str(input_text)
-    thread = client.beta.threads.create()
-    message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
-    run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
-    run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-    loop_until_completed(client, thread, run_status)
-    # OpenAI API interaction
-    #user_message = str(input_text)
-    #thread = client.beta.threads.create()
-    #message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
-    #run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
-    #run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run_obj.id)
-    #loop_until_completed(client, thread, run_status)
-    
-    # Capture and process output
-    captured_output = capture_printed_output()
-    os.write(1, f"{captured_output}\n".encode())
-    df = parse_output(captured_output)
-    highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
-    st.session_state.highlighted_df = highlighted_df
-    st.session_state.show_guide = False
-    st.session_state.show_results = True
+    if input_text:
+        # Perform POS tagging with all models
+        user_message = str(input_text)
+        thread = client.beta.threads.create()
+        message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
+        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
+        run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+        loop_until_completed(client, thread, run_status)
+        
+        # Capture and process output
+        captured_output = capture_printed_output()
+        os.write(1, f"{captured_output}\n".encode())
+        df = parse_output(captured_output)
+        highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
+        st.session_state.highlighted_df = highlighted_df
+        st.session_state.show_guide = False
+        st.session_state.show_results = True
+    else:
+        st.write("Будь ласка, уведіть текст для аналізу.")
 
 # Show the dataframe if the "Почати" button has been clicked
 if st.session_state.show_results:
