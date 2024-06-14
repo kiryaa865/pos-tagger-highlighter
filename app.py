@@ -24,13 +24,9 @@ hide_streamlit_style = """
             </style>
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 
-# Load secrets
-#openai_api_key = st.secrets["OPENAI_API_KEY"]
+client = openai.Client(api_key=os.environ.get("OPENAI_API_KEY"))
 assistant = client.beta.assistants.retrieve("asst_j3as6b0uolhI7cLVU8MS40cK")
-#os.environ["OPENAI_API_KEY"] = openai_api_key
-#client = OpenAI()
 
 # Function to install the SpaCy model if not present
 @st.cache_resource
@@ -136,12 +132,6 @@ st.title("Інструмент для порівняння POS-тегуванн�
 
 input_text = st.text_area("Уведіть текст для аналізу:")
 
-if not input_text:
-    st.write("Будь ласка, уведіть текст для аналізу.")
-
-# OpenAI API interaction
-assistant = client.beta.assistants.retrieve("asst_j3as6b0uolhI7cLVU8MS40cK")
-
 def capture_printed_output():
     captured_output = io.StringIO()
     with redirect_stdout(captured_output):
@@ -237,39 +227,26 @@ def highlight_discrepancies(row):
     tags = [tag.strip() if tag is not None else None for tag in tags]  # Strip whitespace from tags
     tag_counts = pd.Series(tags).value_counts()
 
-    # Debug print statements
-    print(f"Token: {row['Token']}")
-    print(f"Tags: {tags}")
-    print(f"Tag Counts: {tag_counts}")
-
     # Check for PUNCT tag
     if 'PUNCT' in tags:
-        print("PUNCT found, no highlighting.")
         return [''] * len(row)
 
     # All models agree
     if len(tag_counts) == 1:
-        print("All models agree, no highlighting.")
         return [''] * len(row)
 
     # 5 out of 6 agree
     if tag_counts.iloc[0] == 5:
         most_common_tag = tag_counts.index[0]
-        result = [''] + ['background-color: yellow' if x != most_common_tag else '' for x in tags]
-        print(f"5 out of 6 agree, highlighting: {result}")
-        return result
+        return [''] + ['background-color: yellow' if x != most_common_tag else '' for x in tags]
 
     # 4 out of 6 agree
     if tag_counts.iloc[0] == 4:
         most_common_tag = tag_counts.index[0]
-        result = [''] + ['background-color: yellow' if x != most_common_tag else '' for x in tags]
-        print(f"4 out of 6 agree, highlighting: {result}")
-        return result
+        return [''] + ['background-color: yellow' if x != most_common_tag else '' for x in tags]
 
     # 3 or fewer agree
-    result = [''] + ['background-color: yellow'] * len(tags)
-    print(f"3 or fewer agree, highlighting the whole row: {result}")
-    return result
+    return [''] + ['background-color: yellow'] * len(tags)
 
 if 'show_results' not in st.session_state:
     st.session_state.show_results = False
@@ -314,26 +291,21 @@ def show_tags_guide():
     data = [{"Тег": tag, "Пояснення": explanation} for tag, explanation in tags_explanations.items()]
     st.table(data)
     
-if st.button("Почати"):
-    if input_text:
-        # Perform POS tagging with all models
-        user_message = str(input_text)
-        thread = client.beta.threads.create()
-        message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
-        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
-        run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
-        loop_until_completed(client, thread, run_status)
-        
-        # Capture and process output
-        captured_output = capture_printed_output()
-        os.write(1, f"{captured_output}\n".encode())
-        df = parse_output(captured_output)
-        highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
-        st.session_state.highlighted_df = highlighted_df
-        st.session_state.show_guide = False
-        st.session_state.show_results = True
-    else:
-        st.write("Будь ласка, уведіть текст для аналізу.")
+if st.button("Почати", disabled=not input_text.strip()):
+    user_message = str(input_text)
+    thread = client.beta.threads.create()
+    message = client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_message)
+    run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id)
+    run_status = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+    loop_until_completed(client, thread, run_status)
+    
+    captured_output = capture_printed_output()
+    os.write(1, f"{captured_output}\n".encode())
+    df = parse_output(captured_output)
+    highlighted_df = df.style.apply(highlight_discrepancies, axis=1)
+    st.session_state.highlighted_df = highlighted_df
+    st.session_state.show_guide = False
+    st.session_state.show_results = True
 
 # Show the dataframe if the "Почати" button has been clicked
 if st.session_state.show_results:
